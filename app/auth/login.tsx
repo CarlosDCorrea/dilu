@@ -35,15 +35,7 @@ export default function LoginScreen() {
                 <ClashGroteskBold style={styles.headerText}>Iniciar Sesión</ClashGroteskBold>
             </View>
             <View style={styles.middleContainer}>
-                <TextInput 
-                style={styles.formTextInput}
-                value={form.username}
-                placeholder='Correo'
-                onChangeText={text => onChangeForm(text, 'username')}></TextInput>
-                <TextInput 
-                style={styles.formTextInput}
-                value={form.password}
-                placeholder='Contraseña'
+                <TextInput
                 secureTextEntry
                 onChangeText={text => onChangeForm(text, 'password')}></TextInput>
                 <Text 

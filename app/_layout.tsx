@@ -1,9 +1,12 @@
+import { useEffect } from 'react';
+import { useColorScheme } from 'react-native';
+
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { SplashScreen, Slot } from 'expo-router';
-import { useEffect } from 'react';
-import { useColorScheme } from 'react-native';
+
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import { SessionProvider } from "../context/ctx";
 
@@ -54,9 +57,11 @@ function RootLayoutNav() {
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <SessionProvider>
-        <Slot />
-      </SessionProvider>
+      <SafeAreaView style={{flex: 1}}>
+        <SessionProvider>
+          <Slot />
+        </SessionProvider>
+      </SafeAreaView>
     </ThemeProvider>
   );
 }

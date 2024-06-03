@@ -1,7 +1,7 @@
 import { Text } from "react-native";
 import { Redirect, Stack, router } from "expo-router";
 
-import { useSession } from "../../context/ctx"
+import { useSession } from "context/ctx"
 
 
 export default function AppLayout(){
@@ -22,6 +22,13 @@ export default function AppLayout(){
     return (
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false}} />
+          <Stack.Screen name="expenses" options={{ headerShown: false }} />
+          <Stack.Screen name="category"
+            options={{
+                headerShown: false,
+                presentation: 'modal',
+                animation: 'fade_from_bottom'
+            }} />
         </Stack>
     )
 }
