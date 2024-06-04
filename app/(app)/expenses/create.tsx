@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Platform, StyleSheet, TextInput, Pressable } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { router, useLocalSearchParams, Link } from "expo-router";
@@ -11,18 +11,54 @@ import { ClashGrotesk, ClashGroteskBold } from "components/text/StyledText";
 
 import { dateFormatter, pesoFormatter } from "utilities/formatters";
 
+import { serverUrl } from "constants/server";
+
 
 type category = {
-  id: string | undefined,
+  category_id: string,
   name: string,
-  subCategory: string | undefined
+  icon: string
 };
 
 type form = {
   value: string;
-  category: category;
+  category: category | undefined;
   date: Date;
 };
+
+function canCreateExpense(form: form): boolean {
+  if (form.category) {
+    return form.value !== '' && form.category.category_id !== '';
+  }
+  return false;
+}
+
+function getCategory(id: string, form: form, setForm: any) {
+  fetch(`${serverUrl}/category/get/${id}`, {
+    method: 'GET',
+    headers: {
+      Aceept: 'application/json',
+      'Content-Type': 'application/json',
+      'Authorization': 'Token 6b6e12cf2e3732506a0811ecd2703b958025d190'
+    }
+  })
+    .then(response => {
+      if (response.ok) {
+        return response.json();
+      }
+
+      return response.text().then(text => { throw new Error(text) })
+    })
+    .then(category => {
+      setForm({
+        ...form,
+        category: category
+      })
+    })
+    .catch(error => {
+      console.error(error);
+    });
+}
 
 function onChangeForm(action: any, form: any, text: string, field: string) {
   if (field === 'value') {
@@ -36,25 +72,33 @@ function onChangeForm(action: any, form: any, text: string, field: string) {
 }
 
 export default function ModalScreen() {
-  const { category } = useLocalSearchParams<{ category: string }>();
+  const { categorySelectedIdParam } = useLocalSearchParams<{ categorySelectedIdParam: string }>();
   const [form, setForm] = useState<form>({
     value: '',
-    category: {
-      id: undefined,
-      name: '',
-      subCategory: undefined
-    },
+    category: undefined,
     date: new Date(Date.now())
   });
 
-  console.log(`rendering ModalScreen and this is the categorySelected at the moment ${category}`)
+  useEffect(() => {
+    console.log('in effect');
+    if (categorySelectedIdParam) {
+      console.log(1)
+      getCategory(categorySelectedIdParam, form, setForm);
+    }
+
+    setForm({
+      ...form,
+      category: undefined
+    })
+  }, [categorySelectedIdParam]);
 
   function createExpense() {
-    fetch('https://localhost:8000/expense/create', {
+    fetch(`${serverUrl}/expense/create`, {
       method: 'POST',
       headers: {
         Aceept: 'application/json',
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': 'Token 6b6e12cf2e3732506a0811ecd2703b958025d190'
       },
       body: JSON.stringify(form)
     })
@@ -100,14 +144,14 @@ export default function ModalScreen() {
           onChangeText={text => onChangeForm(setForm, form, text, 'value')}></TextInput>
         <Link href={{
           pathname: '/category',
-          params: category ? { category: category } : undefined
+          params: categorySelectedIdParam ? { categorySelectedIdParam: categorySelectedIdParam } : undefined
         }} asChild>
           <Pressable>
             <TextInput
               style={styles.formTextInput}
               placeholder="Categoría"
               placeholderTextColor='black'
-              value={form.category.name}
+              value={form.category ? form.category.name : ''}
               editable={false}
               onChangeText={text => onChangeForm(setForm, form, text, 'category')}></TextInput>
           </Pressable>
@@ -122,10 +166,10 @@ export default function ModalScreen() {
       </View>
       <View style={{ backgroundColor: 'transparent' }}>
         <Pressable
-          style={styles.createExpenseButton}
+          style={[styles.createExpenseButton, canCreateExpense(form) ? styles.createExpenseActiveButton : styles.createExpenseInactiveButton]}
           onPress={() => {
             createExpense();
-            router.replace('/')
+            //router.replace('/')
           }}>
           <ClashGrotesk style={{ textAlign: 'center', fontSize: 20, color: 'white' }}>Crear</ClashGrotesk>
         </Pressable>
@@ -170,12 +214,17 @@ const styles = StyleSheet.create({
   },
   createExpenseButton: {
     width: '50%',
-    backgroundColor: '#ff4500',
     alignSelf: 'center',
     marginTop: 20,
     borderWidth: 1,
     borderRadius: 30,
     paddingVertical: 10
+  },
+  createExpenseActiveButton: {
+    backgroundColor: '#ff4500'
+  },
+  createExpenseInactiveButton: {
+    backgroundColor: '#FF9D79'
   },
   dismissButton: {
     width: '50%',
@@ -191,6 +240,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     fontSize: 20,
     paddingVertical: 11,
-    paddingStart: 10
+    paddingStart: 10,
+    color: 'black'
   }
 });
