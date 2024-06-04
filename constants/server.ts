@@ -1,0 +1,1 @@
+export const serverUrl = 'http://192.168.172.1:8000'
