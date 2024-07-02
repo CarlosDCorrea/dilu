@@ -6,12 +6,12 @@ import { randomUUID, CryptoEncoding } from "expo-crypto";
 
 import { DateTimePickerAndroid, DateTimePickerEvent, AndroidNativeProps } from '@react-native-community/datetimepicker';
 
-import { View } from 'components/Themed';
-import { ClashGrotesk, ClashGroteskBold } from "components/text/StyledText";
+import { View } from '@/components/Themed';
+import { Montserrat, MontserratBold } from "@/components/text/StyledText";
 
-import { dateFormatter, pesoFormatter } from "utilities/formatters";
+import { dateFormatter, pesoFormatter } from "@/utilities/formatters";
 
-import { serverUrl } from "constants/server";
+import { serverUrl } from "@/constants/server";
 
 
 type category = {
@@ -133,7 +133,7 @@ export default function ModalScreen() {
 
   return (
     <View style={styles.container}>
-      <ClashGroteskBold style={{ fontSize: 30, alignSelf: 'center', color: '#8b4513' }}>Registrar Gasto</ClashGroteskBold>
+      <MontserratBold style={{ fontSize: 30, alignSelf: 'center', color: '#8b4513' }}>Registrar Gasto</MontserratBold>
       <View style={styles.middleContainer}>
         <TextInput
           style={styles.formTextInput}
@@ -171,7 +171,7 @@ export default function ModalScreen() {
             createExpense();
             //router.replace('/')
           }}>
-          <ClashGrotesk style={{ textAlign: 'center', fontSize: 20, color: 'white' }}>Crear</ClashGrotesk>
+          <Montserrat style={{ textAlign: 'center', fontSize: 20, color: 'white' }}>Crear</Montserrat>
         </Pressable>
         <Pressable
           style={styles.dismissButton}
@@ -179,7 +179,7 @@ export default function ModalScreen() {
             router.back();
           }}
         >
-          <ClashGrotesk style={{ textAlign: 'center', fontSize: 20, color: 'black' }}>Dismiss</ClashGrotesk>
+          <Montserrat style={{ textAlign: 'center', fontSize: 20, color: 'black' }}>Dismiss</Montserrat>
         </Pressable>
       </View>
       <StatusBar style={Platform.OS == 'ios' ? 'light' : 'dark'} />

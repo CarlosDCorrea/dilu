@@ -4,10 +4,9 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { Link } from "expo-router";
 import { FlashList } from "@shopify/flash-list";
 
-import { View } from 'components/Themed';
+import { View } from '@/components/Themed';
 
-import { ClashGroteskBold, ClashGrotesk, ClashGroteskLight } from 'components/text/StyledText';
-
+import { MontserratBold, Montserrat, MontserratLight } from '@/components/text/StyledText';
 
 
 type record = {
@@ -94,15 +93,14 @@ const records: record[] = [
   },
 ]
 
-
 export default function HomeScreen() {
   // TODO: Take a look at the flash list and expo-dev-client in the future
   return (
     <View style={styles.container}>
       <View style={{ alignItems: 'center' }}>
-        <ClashGroteskBold style={{ fontSize: 25 }}>Marzo 14</ClashGroteskBold>
+        <MontserratBold style={{ fontSize: 25 }}>Marzo 14</MontserratBold>
         <View style={{ flexDirection: 'row', paddingTop: 10 }}>
-          <ClashGrotesk style={{ fontSize: 20, alignSelf: 'center' }}>Gastos:  <ClashGroteskLight>$50.000</ClashGroteskLight></ClashGrotesk>
+          <Montserrat style={{ fontSize: 20, alignSelf: 'center' }}>Gastos:  <MontserratLight>$50.000</MontserratLight></Montserrat>
           <Link href="/expenses/create">
             <MaterialIcons style={{ marginLeft: 10, alignSelf: 'center' }} name="add-circle" size={24} color="#fb8500" />
           </Link>
@@ -114,15 +112,15 @@ export default function HomeScreen() {
         renderItem={({ item }) =>
           <View style={{ flex: 1, flexDirection: 'row', marginBottom: 10 }}>
             <View style={{ flex: 0.2, justifyContent: 'center', alignItems: 'center' }}>
-              <ClashGroteskBold style={{ fontSize: 40 }}>{item.day}</ClashGroteskBold>
+              <MontserratBold style={{ fontSize: 40 }}>{item.day}</MontserratBold>
             </View>
             <View style={{ flex: 0.8, flexDirection: 'row', alignItems: 'center', paddingLeft: 10 }}>
-              <ClashGroteskLight style={{ flex: 0.8, fontSize: 20 }}>{item.description}</ClashGroteskLight>
-              <ClashGrotesk style={{ flex: 0.2, fontSize: 15 }}>{item.value}</ClashGrotesk>
+              <MontserratLight style={{ flex: 0.8, fontSize: 20 }}>{item.description}</MontserratLight>
+              <Montserrat style={{ flex: 0.2, fontSize: 15 }}>{item.value}</Montserrat>
             </View>
           </View>
         }
-        estimatedItemSize={40}
+        estimatedItemSize={20}
       />
     </View>
   );

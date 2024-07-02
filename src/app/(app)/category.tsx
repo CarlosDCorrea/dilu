@@ -6,8 +6,8 @@ import { StatusBar } from 'expo-status-bar';
 
 import { AntDesign, Ionicons } from '@expo/vector-icons';
 
-import { ClashGroteskBold, ClashGrotesk } from 'components/text/StyledText';
-import { serverUrl } from 'constants/server'
+import { MontserratBold, Montserrat } from '@/components/text/StyledText';
+import { serverUrl } from '@/constants/server'
 
 
 type category = {
@@ -63,7 +63,7 @@ export default function CategorySelect() {
   return (
     <View style={{ flex: 1, justifyContent: 'center' }}>
       <View style={{ alignItems: 'center', marginBottom: 30 }}>
-        <ClashGroteskBold style={{ fontSize: 30, color: '#8b4513' }}>Seleccionar una categoria</ClashGroteskBold>
+        <MontserratBold style={{ fontSize: 30, color: '#8b4513' }}>Seleccionar una categoria</MontserratBold>
       </View>
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', alignContent: 'center', justifyContent: 'center' }}>
         {categories && categories.map((category) => (
@@ -88,7 +88,7 @@ export default function CategorySelect() {
                 borderRadius: 10
               }}>
               <AntDesign name={category.icon} size={30} color={categorySelectedId === category.category_id ? "#fffaf0" : "black"} />
-              <ClashGrotesk style={{ fontSize: 20, color: categorySelectedId === category.category_id ? "#fffaf0" : "black" }}>{category.name}</ClashGrotesk>
+              <Montserrat style={{ fontSize: 20, color: categorySelectedId === category.category_id ? "#fffaf0" : "black" }}>{category.name}</Montserrat>
             </View>
           </Pressable>
         ))}
