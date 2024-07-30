@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { View, Pressable, StyleSheet } from 'react-native';
 
-import { Link, useLocalSearchParams } from 'expo-router';
+import { Link, useLocalSearchParams, router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 
 import { AntDesign, Ionicons } from '@expo/vector-icons';
@@ -18,10 +18,6 @@ type category = {
 
 
 function listCategories(setCategories: any): void {
-  let queryParams = {
-
-  }
-
   fetch(`${serverUrl}/category/list`, {
     method: 'GET',
     headers: {
@@ -38,7 +34,7 @@ function listCategories(setCategories: any): void {
       return response.text().then(text => { throw new Error(text) })
     })
     .then(data => {
-      setCategories(data);
+      setCategories(data.results);
     })
     .catch(error => {
       console.log(error);
@@ -48,16 +44,13 @@ function listCategories(setCategories: any): void {
 export default function CategorySelect() {
   const [categories, setCategories] = useState<category[]>();
   const [categorySelectedId, setCategorySelectedId] = useState<string | undefined>();
-  const { categorySelectedIdParam } = useLocalSearchParams<{ categorySelectedIdParam: string }>();
+  const { categorySelectedIdParam, expenseId } = useLocalSearchParams<{ categorySelectedIdParam: string, expenseId?: string }>();
+
+
 
   useEffect(() => {
-    console.log('being called');
     listCategories(setCategories);
     setCategorySelectedId(categorySelectedIdParam);
-    if (categories) {
-      console.log(categories.length);
-    }
-    console.log(`categorySelected ${categorySelectedId}`)
   }, []);
 
   return (
@@ -67,15 +60,15 @@ export default function CategorySelect() {
       </View>
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', alignContent: 'center', justifyContent: 'center' }}>
         {categories && categories.map((category) => (
-          <Pressable onPress={(_) => {
-            if (categorySelectedId === category.category_id) {
-              setCategorySelectedId(undefined);
-            } else {
-              setCategorySelectedId(category.category_id);
-            }
-          }}>
+          <Pressable key={category.category_id}
+            onPress={(_) => {
+              if (categorySelectedId === category.category_id) {
+                setCategorySelectedId(undefined);
+              } else {
+                setCategorySelectedId(category.category_id);
+              }
+            }}>
             <View
-              key={category.category_id}
               style={{
                 backgroundColor: categorySelectedId === category.category_id ? '#ff8c00' : 'transparent',
                 justifyContent: 'center',
@@ -97,8 +90,11 @@ export default function CategorySelect() {
       <Link
         style={{ alignSelf: 'center', marginTop: 30 }}
         href={{
-          pathname: '/expenses/create',
-          params: categorySelectedId ? { categorySelectedIdParam: categorySelectedId } : undefined
+          pathname: expenseId ? `/expenses/update/[id]` : '/expenses/create',
+          params: {
+            expenseId: expenseId,
+            categorySelectedId: categorySelectedId
+          }
         }}>
         {categorySelectedId === undefined ? (
           <Ionicons name="arrow-back-sharp" size={30} color="#ff4500" />

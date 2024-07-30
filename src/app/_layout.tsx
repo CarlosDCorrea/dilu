@@ -7,6 +7,7 @@ import { useFonts } from 'expo-font';
 import { SplashScreen, Slot } from 'expo-router';
 
 import { SafeAreaView } from "react-native-safe-area-context";
+import { RootSiblingParent } from 'react-native-root-siblings';
 
 import { SessionProvider } from "@/context/ctx";
 
@@ -59,9 +60,11 @@ function RootLayoutNav() {
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <SafeAreaView style={{flex: 1}}>
+      <SafeAreaView style={{ flex: 1 }}>
         <SessionProvider>
-          <Slot />
+          <RootSiblingParent>
+            <Slot />
+          </RootSiblingParent>
         </SessionProvider>
       </SafeAreaView>
     </ThemeProvider>

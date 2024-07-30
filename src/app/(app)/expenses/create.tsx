@@ -1,63 +1,63 @@
+import React from 'react';
 import { useEffect, useState } from "react";
 import { Platform, StyleSheet, TextInput, Pressable } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { router, useLocalSearchParams, Link } from "expo-router";
-import { randomUUID, CryptoEncoding } from "expo-crypto";
 
 import { DateTimePickerAndroid, DateTimePickerEvent, AndroidNativeProps } from '@react-native-community/datetimepicker';
+import Toast from 'react-native-root-toast';
 
 import { View } from '@/components/Themed';
 import { Montserrat, MontserratBold } from "@/components/text/StyledText";
 
 import { dateFormatter, pesoFormatter } from "@/utilities/formatters";
 
-import { serverUrl } from "@/constants/server";
+import { form } from "@/types/expenses";
+import { category } from "@/types/category";
+
+import { get } from "@/api/category";
+import { create } from "@/api/expense";
 
 
-type category = {
-  category_id: string,
-  name: string,
-  icon: string
-};
+// REQUESTS
+function createExpense(form: form) {
+  create(form)
+    .then(_ => router.back())
+    .catch(error => console.log(error));
+}
 
-type form = {
-  value: string;
-  category: category | undefined;
-  date: Date;
+function getCategory(
+  form: form,
+  setForm: React.Dispatch<React.SetStateAction<form>>,
+  setCategorySelected: React.Dispatch<React.SetStateAction<category | null>>,
+  categoryId?: string,): void {
+  if (categoryId) {
+    get(categoryId)
+      .then(category => {
+        setForm({
+          ...form,
+          category: category.category_id
+        })
+        setCategorySelected(category);
+      })
+      .catch(error => console.log(error));
+  } else {
+    setForm({
+      ...form,
+      category: null
+    });
+  }
+}
+
+const initialFormState = {
+  value: '',
+  description: '',
+  category: null,
+  created: new Date(Date.now())
 };
 
 function canCreateExpense(form: form): boolean {
-  if (form.category) {
-    return form.value !== '' && form.category.category_id !== '';
-  }
-  return false;
-}
-
-function getCategory(id: string, form: form, setForm: any) {
-  fetch(`${serverUrl}/category/get/${id}`, {
-    method: 'GET',
-    headers: {
-      Aceept: 'application/json',
-      'Content-Type': 'application/json',
-      'Authorization': 'Token 6b6e12cf2e3732506a0811ecd2703b958025d190'
-    }
-  })
-    .then(response => {
-      if (response.ok) {
-        return response.json();
-      }
-
-      return response.text().then(text => { throw new Error(text) })
-    })
-    .then(category => {
-      setForm({
-        ...form,
-        category: category
-      })
-    })
-    .catch(error => {
-      console.error(error);
-    });
+  return form.value !== '';
 }
 
 function onChangeForm(action: any, form: any, text: string, field: string) {
@@ -71,65 +71,39 @@ function onChangeForm(action: any, form: any, text: string, field: string) {
   });
 }
 
-export default function ModalScreen() {
-  const { categorySelectedIdParam } = useLocalSearchParams<{ categorySelectedIdParam: string }>();
-  const [form, setForm] = useState<form>({
-    value: '',
-    category: undefined,
-    date: new Date(Date.now())
-  });
+function resetForm(setForm: React.Dispatch<React.SetStateAction<form>>): void {
+  setForm(initialFormState);
+}
 
-  useEffect(() => {
-    console.log('in effect');
-    if (categorySelectedIdParam) {
-      console.log(1)
-      getCategory(categorySelectedIdParam, form, setForm);
-    }
-
+function onChangeDateClosure(form: form, setForm: React.Dispatch<React.SetStateAction<form>>) {
+  function onChangeDate(_: DateTimePickerEvent, selectedDate: Date | undefined) {
     setForm({
       ...form,
-      category: undefined
-    })
-  }, [categorySelectedIdParam]);
-
-  function createExpense() {
-    fetch(`${serverUrl}/expense/create`, {
-      method: 'POST',
-      headers: {
-        Aceept: 'application/json',
-        'Content-Type': 'application/json',
-        'Authorization': 'Token 6b6e12cf2e3732506a0811ecd2703b958025d190'
-      },
-      body: JSON.stringify(form)
-    })
-      .then(response => response.json())
-      .then(json => {
-        console.log(json.message);
-        router.back();
-      })
-      .catch(error => {
-        console.error(error);
-      });
-  }
-
-  const onChangeDate = (_: DateTimePickerEvent, selectedDate: Date | undefined) => {
-    setForm({
-      ...form,
-      ['date']: selectedDate ? selectedDate : new Date(Date.now())
+      ['created']: selectedDate ? selectedDate : new Date(Date.now())
     });
   };
 
-  const showMode = (currentMode: AndroidNativeProps['mode']) => {
+  function showMode(currentMode: AndroidNativeProps['mode']) {
     DateTimePickerAndroid.open({
-      value: form.date,
+      value: form.created,
       onChange: onChangeDate,
       mode: currentMode
     });
   };
 
-  const showDatePicker = () => {
-    showMode('date')
-  }
+  return showMode;
+}
+
+export default function ModalScreen() {
+  const { categorySelectedId } = useLocalSearchParams<{ categorySelectedId: string }>();
+  const [categorySelected, setCategorySelected] = useState<category | null>(null);
+  const [form, setForm] = useState<form>(initialFormState);
+
+  useEffect(() => {
+    getCategory(form, setForm, setCategorySelected, categorySelectedId);
+  }, [categorySelectedId]);
+
+  let showDatePicker = onChangeDateClosure(form, setForm);
 
   return (
     <View style={styles.container}>
@@ -142,33 +116,40 @@ export default function ModalScreen() {
           placeholderTextColor='black'
           value={form.value ? pesoFormatter().format(parseInt(form.value)).toString().split(',')[0] : ""}
           onChangeText={text => onChangeForm(setForm, form, text, 'value')}></TextInput>
+        <TextInput
+          style={styles.formTextInput}
+          placeholder="Breve Descripción"
+          placeholderTextColor='gray'
+          value={form.description}
+          onChangeText={text => onChangeForm(setForm, form, text, 'description')}></TextInput>
         <Link href={{
           pathname: '/category',
-          params: categorySelectedIdParam ? { categorySelectedIdParam: categorySelectedIdParam } : undefined
+          params: categorySelectedId ? { categorySelectedIdParam: categorySelectedId } : undefined
         }} asChild>
           <Pressable>
             <TextInput
               style={styles.formTextInput}
               placeholder="Categoría"
               placeholderTextColor='black'
-              value={form.category ? form.category.name : ''}
+              value={form.category ? categorySelected?.name : ''}
               editable={false}
               onChangeText={text => onChangeForm(setForm, form, text, 'category')}></TextInput>
           </Pressable>
         </Link>
-        <Pressable onPress={_ => showDatePicker()}>
+        <Pressable onPress={_ => showDatePicker('date')}>
           <TextInput
             style={styles.formTextInput}
-            placeholder={`Fecha: ${dateFormatter().format(form.date)}`}
+            placeholder={`Fecha: ${dateFormatter().format(form.created)}`}
             placeholderTextColor='black'
-            editable={false}></TextInput>
+            editable={false}>
+          </TextInput>
         </Pressable>
       </View>
       <View style={{ backgroundColor: 'transparent' }}>
         <Pressable
           style={[styles.createExpenseButton, canCreateExpense(form) ? styles.createExpenseActiveButton : styles.createExpenseInactiveButton]}
           onPress={() => {
-            createExpense();
+            createExpense(form);
             //router.replace('/')
           }}>
           <Montserrat style={{ textAlign: 'center', fontSize: 20, color: 'white' }}>Crear</Montserrat>

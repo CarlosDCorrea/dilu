@@ -1,127 +1,60 @@
-import { StyleSheet, Pressable } from 'react-native';
+import React from "react";
+import { useState, useCallback } from "react";
+import { StyleSheet } from 'react-native';
 
 import { MaterialIcons } from '@expo/vector-icons';
-import { Link } from "expo-router";
-import { FlashList } from "@shopify/flash-list";
+import { Link, useFocusEffect } from "expo-router";
 
 import { View } from '@/components/Themed';
+import { MontserratBold, MontserratLight } from '@/components/text/StyledText';
 
-import { MontserratBold, Montserrat, MontserratLight } from '@/components/text/StyledText';
+import ListExpensesPage from "@/components/expenses/list";
+
+import { getMonth, pesoFormatter } from "@/utilities/formatters";
+
+import { getTotal } from "@/api/expense";
 
 
-type record = {
-  day: number;
-  value: number;
-  description: string;
+function getTotalExpensesValue(
+  setTotalExpenses: React.Dispatch<React.SetStateAction<number>>): void {
+    const today: Date = new Date(Date.now());
+    const currentYear: number = today.getFullYear()
+    const currentMonth: number = today.getMonth()
+    const firstDayOfMonth: string = new Date(currentYear, currentMonth).toISOString().split('T')[0];
+    // This is the day before of the current month
+    const endDayOfMonth: string = new Date(currentYear, currentMonth + 1, 0).toISOString().split('T')[0];
+
+    getTotal(firstDayOfMonth, endDayOfMonth)
+    .then(data => setTotalExpenses(data.total))
+    .catch(error => error);
 }
 
-const records: record[] = [
-  {
-    day: 1,
-    value: 5000,
-    description: "something"
-  },
-  {
-    day: 1,
-    value: 5000,
-    description: "something"
-  },
-  {
-    day: 1,
-    value: 5000,
-    description: "something"
-  },
-  {
-    day: 1,
-    value: 5000,
-    description: "something"
-  },
-  {
-    day: 1,
-    value: 5000,
-    description: "something"
-  },
-  {
-    day: 1,
-    value: 5000,
-    description: "something"
-  },
-  {
-    day: 1,
-    value: 5000,
-    description: "something"
-  },
-  {
-    day: 1,
-    value: 5000,
-    description: "something"
-  },
-  {
-    day: 1,
-    value: 5000,
-    description: "something"
-  },
-  {
-    day: 1,
-    value: 5000,
-    description: "something"
-  },
-  {
-    day: 1,
-    value: 5000,
-    description: "something"
-  },
-  {
-    day: 1,
-    value: 5000,
-    description: "something"
-  },
-  {
-    day: 1,
-    value: 5000,
-    description: "something"
-  },
-  {
-    day: 1,
-    value: 5000,
-    description: "something"
-  },
-  {
-    day: 1,
-    value: 5000,
-    description: "something"
-  },
-]
 
 export default function HomeScreen() {
-  // TODO: Take a look at the flash list and expo-dev-client in the future
+  const [totalExpenses, setTotalExpenses] = useState<number>(0);
+
+  useFocusEffect(
+    useCallback(() => {
+      getTotalExpensesValue(setTotalExpenses);
+    }, [])
+  );
+
+  const today: Date = new Date(Date.now());
+  const month: string = getMonth('long').format(today);
+
   return (
     <View style={styles.container}>
       <View style={{ alignItems: 'center' }}>
-        <MontserratBold style={{ fontSize: 25 }}>Marzo 14</MontserratBold>
-        <View style={{ flexDirection: 'row', paddingTop: 10 }}>
-          <Montserrat style={{ fontSize: 20, alignSelf: 'center' }}>Gastos:  <MontserratLight>$50.000</MontserratLight></Montserrat>
+        <MontserratBold style={{ fontSize: 25 }}>{month[0].toUpperCase() + month.slice(1)}</MontserratBold>
+        <View style={{ flexDirection: 'row', paddingTop: 10, alignItems: 'center' }}>
+          <MontserratLight style={{ fontSize: 20, alignSelf: 'center', marginRight: 5 }}>{pesoFormatter().format(totalExpenses)}</MontserratLight>
           <Link href="/expenses/create">
-            <MaterialIcons style={{ marginLeft: 10, alignSelf: 'center' }} name="add-circle" size={24} color="#fb8500" />
+            <MaterialIcons style={{ alignSelf: 'center' }} name="add-circle" size={24} color="#fb8500" />
           </Link>
         </View>
         <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
       </View>
-      <FlashList
-        data={records}
-        renderItem={({ item }) =>
-          <View style={{ flex: 1, flexDirection: 'row', marginBottom: 10 }}>
-            <View style={{ flex: 0.2, justifyContent: 'center', alignItems: 'center' }}>
-              <MontserratBold style={{ fontSize: 40 }}>{item.day}</MontserratBold>
-            </View>
-            <View style={{ flex: 0.8, flexDirection: 'row', alignItems: 'center', paddingLeft: 10 }}>
-              <MontserratLight style={{ flex: 0.8, fontSize: 20 }}>{item.description}</MontserratLight>
-              <Montserrat style={{ flex: 0.2, fontSize: 15 }}>{item.value}</Montserrat>
-            </View>
-          </View>
-        }
-        estimatedItemSize={20}
-      />
+      <ListExpensesPage />
     </View>
   );
 }
