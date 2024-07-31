@@ -1,11 +1,10 @@
 import { useState } from "react";
 import { View, Text, StyleSheet, SafeAreaView, TextInput, Pressable } from "react-native";
 import { Link, router } from "expo-router";
-import { Image } from "expo-image";
 
 import { useSession } from "../../context/ctx";
 
-import { ClashGroteskBold } from "../../components/text/StyledText";
+import { Montserrat } from "../../components/text/StyledText";
 
 
 type form = {
@@ -32,7 +31,7 @@ export default function LoginScreen() {
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.headerContainer}>
-                <ClashGroteskBold style={styles.headerText}>Iniciar Sesión</ClashGroteskBold>
+                <Montserrat style={styles.headerText}>Iniciar Sesión</Montserrat>
             </View>
             <View style={styles.middleContainer}>
                 <TextInput
@@ -48,7 +47,7 @@ export default function LoginScreen() {
                    style={styles.loginButton}
                    onPress={() => {
                     signIn('token');
-                    router.replace('/')
+                    router.replace('/home')
                     }}>
                     <Text style={{textAlign: 'center', fontSize: 20, color: 'white'}}>Iniciar Sesión</Text>
                 </Pressable>

@@ -66,6 +66,26 @@ export function update(id: string, form: form): Promise<Response> {
         })
 }
 
+export function deleteExpense(expenseId: string): Promise<Response> {
+    return fetch(`${serverUrl}/expense/delete/${expenseId}`, {
+        method: 'DELETE',
+        headers: {
+            Aceept: 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'Token 6b6e12cf2e3732506a0811ecd2703b958025d190'
+        }
+    })
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            }
+            return response.text().then(text => {
+                console.log(text);
+                throw new Error(text)
+            })
+        })
+}
+
 export function get(id: string): Promise<form> {
     return fetch(`${serverUrl}/expense/get-by-owner/${id}`, {
         method: 'GET',
@@ -83,7 +103,7 @@ export function get(id: string): Promise<form> {
         })
 }
 
-export function getTotal(startDate: string, endDate: string): Promise<{total: number}>{
+export function getTotal(startDate: string, endDate: string): Promise<{ total: number }> {
     return fetch(`${serverUrl}/expense/total-value/${startDate}/${endDate}`, {
         method: 'GET',
         headers: {
@@ -92,11 +112,11 @@ export function getTotal(startDate: string, endDate: string): Promise<{total: nu
             'Authorization': 'Token 6b6e12cf2e3732506a0811ecd2703b958025d190'
         }
     })
-    .then(response => {
-        if (response.ok){
-            return response.json();
-        }
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            }
 
-        return response.text().then(text => { throw new Error(text) });
-    })
+            return response.text().then(text => { throw new Error(text) });
+        })
 }

@@ -23,7 +23,7 @@ export default function TabLayout() {
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
       }}>
       <Tabs.Screen
-        name="index"
+        name="home"
         options={{
           title: 'Inicio',
           tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
@@ -50,13 +50,13 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
         }}
       />
-      {/* <Tabs.Screen
-        name="horme"
+      <Tabs.Screen
+        name="dilus"
         options={{
-          title: "Hormes",
+          title: "Dilus",
           tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
         }}
-      /> */}
+      />
     </Tabs>
   );
 }

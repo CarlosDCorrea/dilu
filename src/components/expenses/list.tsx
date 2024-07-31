@@ -1,12 +1,17 @@
 import { useState, useCallback } from "react";
 import { StyleSheet, Pressable } from 'react-native';
 
-import { Link, useFocusEffect } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
+import { useActionSheet, ActionSheetOptions } from "@expo/react-native-action-sheet";
+import Feather from '@expo/vector-icons/Feather';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+
 import { FlashList } from "@shopify/flash-list";
 
 import { expense } from "@/types/expenses";
 
-import { list } from "@/api/expense";
+import { list, deleteExpense as deleteExpenseAPI } from "@/api/expense";
 
 import { dateVerboseFormatter, pesoFormatter } from "@/utilities/formatters";
 
@@ -31,11 +36,49 @@ function listExpenses(
         .catch(error => console.log(error));
 }
 
+function openActionSheet(
+    expenseId: string,
+    showActionSheetWithOptions: (options: ActionSheetOptions, callback: (i?: number) => void | Promise<void>) => void,
+    expenses: expense[],
+    setExpenses: React.Dispatch<React.SetStateAction<expense[]>>) {
+    const options: string[] = ['Editar', 'Eliminar', 'Cancelar'];
+    const destructiveButtonIndex: number = 1;
+    const cancelButtonIndex: number = 2;
+
+    showActionSheetWithOptions({
+        options,
+        cancelButtonIndex,
+        destructiveButtonIndex,
+        showSeparators: true,
+        icons: [
+            <Feather name="edit" size={24} color="black" />,
+            <MaterialIcons name="delete" size={24} color="black" />,
+            <MaterialCommunityIcons name="cancel" size={24} color="black" />
+        ]
+    }, (selectedIndex: number | undefined) => {
+        switch (selectedIndex) {
+            case 0:
+                router.navigate({
+                    pathname: '/expenses/update/[id]',
+                    params: { expenseId: expenseId }
+                })
+                break;
+            case destructiveButtonIndex:
+                    deleteExpenseAPI(expenseId)
+                    .then(_ => {
+                        setExpenses(expenses.filter(expense => expense.expense_id !== expenseId));
+                    })
+                break;
+            default: //CANCEL
+                break;
+        }
+    })
+}
+
 function ListExpensesPage() {
     const [expenses, setExpenses] = useState<expense[]>([]);
     const [next, setNext] = useState<string | null>(null);
-
-    console.log('just rendering list page');
+    const { showActionSheetWithOptions } = useActionSheet();
 
     useFocusEffect(
         useCallback(() => {
@@ -47,23 +90,23 @@ function ListExpensesPage() {
         <FlashList
             data={expenses}
             renderItem={({ item }) =>
-                <Link
-                    key={item.expense_id}
-                    asChild
-                    href={{
-                        pathname: '/expenses/update/[id]',
-                        params: { expenseId: item.expense_id }
+                <Pressable
+                    style={{ flex: 1, flexDirection: 'row', marginVertical: 10 }}
+                    onPress={_ => {
+                        openActionSheet(
+                            item.expense_id,
+                            showActionSheetWithOptions,
+                            expenses,
+                            setExpenses);
                     }}>
-                    <Pressable style={{ flex: 1, flexDirection: 'row', marginVertical: 10 }}>
-                        <View style={{ flex: 0.7, flexDirection: 'column', justifyContent: 'center', paddingLeft: 10 }}>
-                            <MontserratBold style={{ fontSize: 15 }}>{dateVerboseFormatter().format(new Date(item.created))}</MontserratBold>
-                            <MontserratLight style={{ flex: 0.8, fontSize: 15 }}>{item.description ? item.description : 'Sin descripcion'}</MontserratLight>
-                        </View>
-                        <View style={{ flex: 0.3, flexDirection: 'row', alignItems: 'center', paddingLeft: 15 }}>
-                            <MontserratBold style={{ fontSize: 15 }}>{pesoFormatter().format(item.value)}</MontserratBold>
-                        </View>
-                    </Pressable>
-                </Link>
+                    <View style={{ flex: 0.7, flexDirection: 'column', justifyContent: 'center', paddingLeft: 10 }}>
+                        <MontserratBold style={{ fontSize: 15 }}>{dateVerboseFormatter().format(new Date(item.created))}</MontserratBold>
+                        <MontserratLight style={{ flex: 0.8, fontSize: 15 }}>{item.description ? item.description : 'Sin descripcion'}</MontserratLight>
+                    </View>
+                    <View style={{ flex: 0.3, flexDirection: 'row', alignItems: 'center', paddingLeft: 15 }}>
+                        <MontserratBold style={{ fontSize: 15 }}>{pesoFormatter().format(item.value)}</MontserratBold>
+                    </View>
+                </Pressable>
             }
             estimatedItemSize={50}
             onEndReached={() => {

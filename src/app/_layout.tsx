@@ -5,6 +5,7 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { SplashScreen, Slot } from 'expo-router';
+import { ActionSheetProvider } from "@expo/react-native-action-sheet";
 
 import { SafeAreaView } from "react-native-safe-area-context";
 import { RootSiblingParent } from 'react-native-root-siblings';
@@ -63,7 +64,9 @@ function RootLayoutNav() {
       <SafeAreaView style={{ flex: 1 }}>
         <SessionProvider>
           <RootSiblingParent>
-            <Slot />
+            <ActionSheetProvider>
+              <Slot />
+            </ActionSheetProvider>
           </RootSiblingParent>
         </SessionProvider>
       </SafeAreaView>
