@@ -11,20 +11,16 @@ import { MontserratBold, MontserratLight } from '@/components/text/StyledText';
 import ListExpensesPage from "@/components/expenses/list";
 
 import { getMonth, pesoFormatter } from "@/utilities/formatters";
+import { getMonthRange } from "@/utilities/dateRanges";
 
 import { getTotal } from "@/api/expense";
 
 
 function getTotalExpensesValue(
   setTotalExpenses: React.Dispatch<React.SetStateAction<number>>): void {
-    const today: Date = new Date(Date.now());
-    const currentYear: number = today.getFullYear()
-    const currentMonth: number = today.getMonth()
-    const firstDayOfMonth: string = new Date(currentYear, currentMonth).toISOString().split('T')[0];
-    // This is the day before of the current month
-    const endDayOfMonth: string = new Date(currentYear, currentMonth + 1, 0).toISOString().split('T')[0];
+    const [firstDateMonth, endDateMonth] = getMonthRange(new Date(Date.now())); 
 
-    getTotal(firstDayOfMonth, endDayOfMonth)
+    getTotal(firstDateMonth.toISOString().split('T')[0], endDateMonth.toISOString().split('T')[0])
     .then(data => setTotalExpenses(data.total))
     .catch(error => error);
 }
@@ -41,6 +37,8 @@ export default function HomeScreen() {
 
   const today: Date = new Date(Date.now());
   const month: string = getMonth('long').format(today);
+
+  console.log(totalExpenses);
 
   return (
     <View style={styles.container}>

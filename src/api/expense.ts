@@ -120,3 +120,24 @@ export function getTotal(startDate: string, endDate: string): Promise<{ total: n
             return response.text().then(text => { throw new Error(text) });
         })
 }
+
+// Graphs
+export function getDailyGraph(startDate: string, endDate: string): Promise<{ value: number, created: string }[]> {
+    return fetch(`${serverUrl}/expense/daily-graph/2024-07-01/2024-07-31`, {
+        method: 'GET',
+        headers: {
+            Aceept: 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'Token 6b6e12cf2e3732506a0811ecd2703b958025d190'
+        }
+    })
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            }
+            return response.text().then(text => {
+                console.log(text);
+                throw new Error(text)
+            })
+        })
+}
