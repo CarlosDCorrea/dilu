@@ -46,7 +46,7 @@ function getYAxis(
 }
 
 
-export default function TabTwoScreen() {
+export default function Graphs() {
   const [xAxis, setXAxis] = useState<number[]>([]);
   const [yAxis, setYAxis] = useState<number[]>([]);
   const [startDateMonth, endDateMonth] = getMonthRange(new Date(Date.now()));
