@@ -10,6 +10,8 @@ import Toast from 'react-native-root-toast';
 import { View } from '@/components/Themed';
 import { Montserrat, MontserratBold } from "@/components/text/StyledText";
 
+import Colors from "@/constants/Colors";
+
 import { dateFormatter, pesoFormatter } from "@/utilities/formatters";
 
 import { form } from "@/types/expenses";
@@ -107,7 +109,7 @@ export default function ModalScreen() {
 
   return (
     <View style={styles.container}>
-      <MontserratBold style={{ fontSize: 30, alignSelf: 'center', color: '#8b4513' }}>Registrar Gasto</MontserratBold>
+      <MontserratBold style={{ fontSize: 30, alignSelf: 'center', color: Colors['secundary'] }}>Registrar Gasto</MontserratBold>
       <View style={styles.middleContainer}>
         <TextInput
           style={styles.formTextInput}
@@ -136,6 +138,7 @@ export default function ModalScreen() {
               onChangeText={text => onChangeForm(setForm, form, text, 'category')}></TextInput>
           </Pressable>
         </Link>
+        {/* put instead a calendar icon and the date selected above or below */}
         <Pressable onPress={_ => showDatePicker('date')}>
           <TextInput
             style={styles.formTextInput}
@@ -160,7 +163,7 @@ export default function ModalScreen() {
             router.back();
           }}
         >
-          <Montserrat style={{ textAlign: 'center', fontSize: 20, color: 'black' }}>Dismiss</Montserrat>
+          <Montserrat style={{ textAlign: 'center', fontSize: 20, color: 'black' }}>Volver</Montserrat>
         </Pressable>
       </View>
       <StatusBar style={Platform.OS == 'ios' ? 'light' : 'dark'} />
@@ -199,13 +202,14 @@ const styles = StyleSheet.create({
     marginTop: 20,
     borderWidth: 1,
     borderRadius: 30,
-    paddingVertical: 10
+    paddingVertical: 10,
+    backgroundColor: Colors['secundary']
   },
   createExpenseActiveButton: {
-    backgroundColor: '#ff4500'
+    opacity: 1
   },
   createExpenseInactiveButton: {
-    backgroundColor: '#FF9D79'
+    opacity: 0.5
   },
   dismissButton: {
     width: '50%',

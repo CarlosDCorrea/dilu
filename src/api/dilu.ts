@@ -2,6 +2,7 @@ import { diluForm, diluListResponse } from "@/types/dilu";
 import { serverUrl } from "@/constants/server";
 
 
+// for a general api module for crud generics could be used?
 export function create(form: diluForm): Promise<Response> {
     return fetch(`${serverUrl}/dilu/create`, {
         method: 'POST',

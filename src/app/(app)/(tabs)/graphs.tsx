@@ -55,7 +55,7 @@ export default function Graphs() {
     useCallback(() => {
       getXAxisValue(endDateMonth, setXAxis);
       getYAxis(startDateMonth, endDateMonth, setYAxis, xAxis);
-    }, [yAxis])
+    }, [])
   )
 
   return (

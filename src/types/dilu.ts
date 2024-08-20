@@ -6,7 +6,8 @@ export type dilu = {
 
 export type diluForm = {
     name: string,
-    participants: string[]
+    participants: string[],
+    isValid: (form: diluForm) => boolean
 }
 
 export type diluListResponse = {

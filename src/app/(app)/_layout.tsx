@@ -26,6 +26,7 @@ export default function AppLayout(){
                 presentation: 'modal',
                 animation: 'fade_from_bottom'
             }} />
+          <Stack.Screen name="dilus" options={{ headerShown: false }} />
         </Stack>
     )
 }

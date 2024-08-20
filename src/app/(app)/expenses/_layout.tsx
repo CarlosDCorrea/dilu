@@ -1,7 +1,4 @@
-import { Text } from "react-native";
-import { Redirect, Stack, router } from "expo-router";
-
-import { useSession } from "@/context/ctx"
+import { Stack } from "expo-router";
 
 
 export default function ExpensesLayout(){

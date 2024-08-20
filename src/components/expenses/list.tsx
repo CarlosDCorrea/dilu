@@ -16,9 +16,9 @@ import { list, deleteExpense as deleteExpenseAPI } from "@/api/expense";
 import { dateVerboseFormatter, pesoFormatter } from "@/utilities/formatters";
 
 import { View } from '@/components/Themed';
-
 import { MontserratBold, MontserratLight } from '@/components/text/StyledText';
 
+import Colors from "@/constants/Colors";
 
 function listExpenses(
     setExpenses: React.Dispatch<React.SetStateAction<expense[]>>,
@@ -45,6 +45,9 @@ function openActionSheet(
     const destructiveButtonIndex: number = 1;
     const cancelButtonIndex: number = 2;
 
+    // When deleting is selected update the total value as well
+    // It seems there is an error when deleting and a request is made to the backend, maybe the pagination fails
+
     showActionSheetWithOptions({
         options,
         cancelButtonIndex,
@@ -64,7 +67,7 @@ function openActionSheet(
                 })
                 break;
             case destructiveButtonIndex:
-                    deleteExpenseAPI(expenseId)
+                deleteExpenseAPI(expenseId)
                     .then(_ => {
                         setExpenses(expenses.filter(expense => expense.expense_id !== expenseId));
                     })
@@ -100,11 +103,11 @@ function ListExpensesPage() {
                             setExpenses);
                     }}>
                     <View style={{ flex: 0.7, flexDirection: 'column', justifyContent: 'center', paddingLeft: 10 }}>
-                        <MontserratBold style={{ fontSize: 15 }}>{dateVerboseFormatter().format(new Date(item.created))}</MontserratBold>
-                        <MontserratLight style={{ flex: 0.8, fontSize: 15 }}>{item.description ? item.description : 'Sin descripcion'}</MontserratLight>
+                        <MontserratBold style={styles.date}>{dateVerboseFormatter().format(new Date(item.created))}</MontserratBold>
+                        <MontserratLight style={styles.description}>{item.description ? item.description : 'Sin descripcion'}</MontserratLight>
                     </View>
                     <View style={{ flex: 0.3, flexDirection: 'row', alignItems: 'center', paddingLeft: 15 }}>
-                        <MontserratBold style={{ fontSize: 15 }}>{pesoFormatter().format(item.value)}</MontserratBold>
+                        <MontserratBold style={styles.value}>{pesoFormatter().format(item.value)}</MontserratBold>
                     </View>
                 </Pressable>
             }
@@ -129,6 +132,17 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 20,
         fontWeight: 'bold',
+    },
+    date: {
+        fontSize: 15
+    },
+    value: {
+        fontSize: 15,
+        color: Colors['secundary']
+    },
+    description: {
+        flex: 0.8,
+        fontSize: 15
     },
     separator: {
         marginVertical: 15,
